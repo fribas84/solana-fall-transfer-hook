@@ -22,13 +22,23 @@ fn test_initialize() {
     initialize_mint(&mut svm, &payer, &mint, &program_id);
 
     // Then initialize the rate limit account
-    let rate_limit = Pubkey::find_program_address(&[b"rate_limit"], &program_id).0;
+    let rate_limit = Pubkey::find_program_address(
+        &[
+            b"rate_limit",
+            mint.pubkey().as_ref(),
+            payer.pubkey().as_ref(),
+        ],
+        &program_id,
+    )
+    .0;
 
     let instruction = Instruction::new_with_bytes(
         program_id,
         &solana_fall_transfer_hook::instruction::Initialize {}.data(),
         solana_fall_transfer_hook::accounts::Initialize {
             payer: payer.pubkey(),
+            mint: mint.pubkey(),
+            owner: payer.pubkey(),
             rate_limit,
             system_program: SYSTEM_PROGRAM_ID,
         }
