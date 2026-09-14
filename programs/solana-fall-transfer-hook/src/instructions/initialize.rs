@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{token_2022, token_interface::Mint};
 
-use crate::{ANCHOR_DISCRIMINATOR_SIZE, RateLimit, error::ErrorCode};
+use crate::{error::ErrorCode, RateLimit, ANCHOR_DISCRIMINATOR_SIZE};
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
@@ -24,7 +24,7 @@ pub struct Initialize<'info> {
 }
 
 pub fn handler(ctx: Context<Initialize>) -> Result<()> {
-    // For the challenge - Ensure the mint is a token-2022 mint by checking its owner (Pass the mint in the context and check its owner. 
+    // For the challenge - Ensure the mint is a token-2022 mint by checking its owner (Pass the mint in the context and check its owner.
     // Consider saving the mint in the RateLimit struct if needed for future use.
     require_keys_eq!(
         *ctx.accounts.mint.to_account_info().owner,
@@ -37,7 +37,7 @@ pub fn handler(ctx: Context<Initialize>) -> Result<()> {
         max_amount: RateLimit::MAX_AMOUNT,
         window_start: Clock::get()?.unix_timestamp,
         amount_transferred: 0,
-        mint: ctx.accounts.mint.key()
+        mint: ctx.accounts.mint.key(),
     });
 
     Ok(())
