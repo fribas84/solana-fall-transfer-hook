@@ -2,8 +2,10 @@ use anchor_lang::prelude::*;
 use anchor_spl::token_interface::{Mint, TokenInterface};
 use spl_transfer_hook_interface::onchain::add_extra_accounts_for_execute_cpi;
 
+use crate::error::ErrorCode;
+
 #[derive(Accounts)]
-pub struct Transfer<'info> {
+pub struct ProgramTransfer<'info> {
     pub owner: Signer<'info>,
     /// CHECK: Token-2022 mutates this (amount + transferring flag)
     #[account(mut)]
@@ -18,12 +20,17 @@ pub struct Transfer<'info> {
     #[account(mut)]
     pub rate_limit: UncheckedAccount<'info>,
     /// CHECK: this program, so Token-2022 can CPI back in
-    #[account(address = crate::ID)]
     pub hook_program: UncheckedAccount<'info>,
     pub token_program: Interface<'info, TokenInterface>,
 }
 
-pub fn handler(ctx: Context<Transfer>, amount: u64) -> Result<()> {
+pub fn handler(ctx: Context<ProgramTransfer>, amount: u64) -> Result<()> {
+    require_keys_eq!(
+        *ctx.accounts.hook_program.key,
+        crate::ID,
+        ErrorCode::CustomError
+    );
+
     let decimals = ctx.accounts.mint.decimals;
 
     let mut cpi_ix = anchor_spl::token_2022::spl_token_2022::instruction::transfer_checked(

@@ -36,4 +36,8 @@ pub mod solana_fall_transfer_hook {
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
         transfer_hook::handler(ctx, amount)
     }
+
+    pub fn transfer_checked(ctx: Context<ProgramTransfer>, amount: u64) -> Result<()> {
+        program_transfer::handler(ctx, amount)
+    }
 }
